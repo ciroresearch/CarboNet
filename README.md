@@ -1,6 +1,6 @@
 # CarboNet: A Finite-Time Combustion-Tolerant Compartmental Network for Tropospheric Carbon Control
 
-This repository contains the source code of the paper: Zocco, F., Haddad, W.M. and Malvezzi, M., 2025. CarboNet: A Finite-Time Combustion-Tolerant Compartmental Network for Tropospheric Carbon Control. arXiv preprint arXiv:2508.16774.
+This repository contains the source code of the paper: Zocco, F., Haddad, W.M. and Malvezzi, M., 2025. CarboNet: A finite-time combustion-tolerant compartmental network for tropospheric carbon control. arXiv preprint arXiv:2508.16774.
 
 <img width="1496" height="456" alt="Key_variables" src="https://github.com/user-attachments/assets/14b8978b-6070-44c1-9fe4-0731b72a10db" />
 
