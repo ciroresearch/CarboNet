@@ -4,7 +4,7 @@ This repository contains the source code of the paper: Zocco, F., Haddad, W.M. a
 
 <img width="1496" height="456" alt="Key_variables" src="https://github.com/user-attachments/assets/14b8978b-6070-44c1-9fe4-0731b72a10db" />
 
-<br>
+<br/><br/>
 
 DESCRIPTION OF SCRIPTS:
 _FullStateFdbk_arbitraryRates_ (Python notebook): Generates the paper results in the case of full-state feedback control and arbitrary rate constants.
