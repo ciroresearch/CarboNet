@@ -1,3 +1,4 @@
+%% 
 %% Static output-feedback design and simulation of the closed-loop response to initial conditions x_0.
 % The output-feedback controller Ki is given by the i-th algorithm
 % of Ilka et al. [1], whose MATLAB implementation is available
@@ -6,7 +7,7 @@
 
 % REFERENCES:
 % [1] Ilka, A. and Murgovski, N., 2022. Novel results on output-feedback LQR design. 
-% IEEE Transactions on Automatic Control, 68(9), pp.5187-5200.
+% IEEE Transactions on Automatic Control, 68(9), pp. 5187-5200.
 % [2] Zocco, F., Haddad, W.M. and Malvezzi, M., 2025. CarboNet: A finite-time combustion-tolerant compartmental network for 
 % tropospheric carbon control. arXiv preprint arXiv:2508.16774.
 % [3] (last access: 14 November 2025) https://codeocean.com/capsule/4291166/tree/v1 
@@ -16,19 +17,23 @@
 
 n_q = 5000; %number of vehicles
 n_h = 10000; %number of houses
+n_p = 20; %number of industrial plants
 
-a_41 = 0.2; %the units are 1/day
+a_41 = 0.2;
 a_12 = 0.5/n_q;
 a_13 = 0.5/n_h;
 a_14 = 0.1;
+a_17 = 0.5/n_p;
 a_42 = 0.5/n_q;
 a_22 = 0.3;
 a_43 = 0.5/n_h;
 a_33 = 0.6;
+a_47 = 0.5/n_p;
+a_77 = 0.8;
 
-A = [-a_41, n_q*a_12, n_h*a_13, a_14; 0, -n_q*(a_12+a_42)+a_22, 0, 0; 0, 0, -n_h*(a_13+a_43)+a_33, 0; a_41, n_q*a_42, n_h*a_43, -a_14];
-B = [-1; 0; 0; 0];
-C = [1, 0, 0, 0];
+A = [-a_41, n_q*a_12, n_h*a_13, a_14, n_p*a_17; 0, -n_q*(a_12+a_42)+a_22, 0, 0, 0; 0, 0, -n_h*(a_13+a_43)+a_33, 0, 0; a_41, n_q*a_42, n_h*a_43, -a_14, n_p*a_47; 0, 0, 0, 0, -n_p*(a_17+a_47)+a_77];
+B = [-1; 0; 0; 0; 0];
+C = [1, 0, 0, 0, 0];
 D = 0;
 
 % Weighting matrices:
@@ -70,12 +75,13 @@ maxIteration = 9e6;                % maximal iteration number
 stopCrit = 1e-12;                  % stopping criteria
 
 % Set initial conditions x0, set-point xe, and translate the state and input:
-x0 = [915.4; 210.0; 500.0; 1830.8]; %initial conditions in tonnes, see [2] for details
+x0 = [915.4; 210.0; 500.0; 1830.8; 4]; %initial conditions in tonnes, see [2] for details
 x1e = 637.2; %as indicated in the source paper [2], which corresponds to the CO2 mass in the pre-industrial era inside a fixed volume
 x2e = 0; %see source paper [2] for the reason of this condition
 x3e = 0; %see source paper [2] for the reason of this condition
-x4e = (a_41/a_14)*x1e; %see source paper [2] for the reason of this condition  
-xe = [x1e; x2e; x3e; x4e]; 
+x4e = (a_41/a_14)*x1e; %see source paper [2] for the reason of this condition 
+x7e = 0;
+xe = [x1e; x2e; x3e; x4e; x7e]; 
 x_tilde_0 = x0 - xe;
 v_e = 0;
 
@@ -122,6 +128,7 @@ x11 = x_tilde1(:,1) + x1e;
 x21 = x_tilde1(:,2) + x2e;
 x31 = x_tilde1(:,3) + x3e;
 x41 = x_tilde1(:,4) + x4e;
+x71 = x_tilde1(:,5) + x7e;
 figure
 plot(t, x11, 'linewidth',4);
 hold on;
@@ -131,11 +138,13 @@ plot(t, x31, '--', 'linewidth',4);
 hold on;
 plot(t, x41, 'linewidth',4);
 grid on
+plot(t, x71, 'linewidth',4);
+grid on
 title("Newton's method")
 xlabel('Time, t [d]')
 ylabel('Original state, x(t) [t]')
-fontsize(29,"points")
-leg = legend('$x_1$', '$x_2$', '$x_3$', '$x_4$');
+fontsize(40,"points")
+leg = legend('$x_1$', '$x_2$', '$x_3$', '$x_4$', '$x_7$');
 set(leg,'Interpreter','latex');
 xlim([0, 70])
 xticks([0, 10, 20, 30, 40, 50, 60, 70])
@@ -148,9 +157,10 @@ grid on
 title("Newton's method")
 xlabel('Time, t [d]')
 ylabel('Original output, y(t) [t]')
-fontsize(29,"points")
+fontsize(40,"points")
 xlim([0, 70])
 xticks([0, 10, 20, 30, 40, 50, 60, 70])
+yticks([600, 700, 800, 900, 1000])
 
 % Original control input u(t) = -K*(y - C*xe) + v_e:
 u1 = - K1*(y1 - C*xe) + v_e;
@@ -160,13 +170,13 @@ grid on
 title("Newton's method")
 xlabel('Time, t [d]')
 ylabel('Control input, u(t) [t/d]')
-fontsize(29,"points")
+fontsize(40,"points")
 xlim([0, 70])
 xticks([0, 10, 20, 30, 40, 50, 60, 70])
 
 % Circularity \lambda(t):
-phi_1 = a_22*x21 + a_33*x31;
-phi_nz = n_q*a_12*x21 + n_q*a_42*x21 + n_h*a_13*x31 + n_h*a_43*x31 - u1;
+phi_1 = a_22*x21 + a_33*x31 + a_77*x71; %tonne/day
+phi_nz = n_q*a_12*x21 + n_q*a_42*x21 + n_h*a_13*x31 + n_h*a_43*x31 + n_p*a_17*x71 + n_p*a_47*x71 - u1; %tonne/day
 lambda = -(phi_1 + phi_nz);
 figure
 plot(t, lambda, 'linewidth', 4)
@@ -177,11 +187,11 @@ plot(t, phi_nz, 'linewidth', 4)
 title("Newton's method")
 xlabel('Time, t [d]')
 ylabel('Key variables [t/d]')
-fontsize(29,"points")
+fontsize(40,"points")
 leg = legend('\lambda', '\phi_1', '\phi_{nz}');
 grid on
 xlim([0, 70])
-xticks([0, 10, 20, 30, 40, 50, 60, 70])
+xticks([0, 20, 40, 60])
 yticks([-750, -500, -250, 0, 250, 500])
 
 

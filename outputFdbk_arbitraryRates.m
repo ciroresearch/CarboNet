@@ -13,9 +13,9 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Matrices of LTI system:
-A = [-3.40742062, 95.81610494, 39.62507976, 5.6353227; 0, -128.84605851, 0, 0; 0, 0, -95.19704966, 0; 3.40742062, 38.56915493, 63.91448913, -5.6353227];
-B = [-1; 0; 0; 0];
-C = [1, 0, 0, 0];
+A = [-1.04232242, 119.22626067, 46.93048874, 7.44121644, 5.25881883; 0.0, -163.34969121, 0.0, 0.0, 0.0; 0.0, 0.0, -103.89851856, 0.0, 0.0; 1.04232242, 51.97083026, 64.49234435, -7.44121644, 2.677852; 0.0, 0.0, 0.0, 0.0, -5.82382971];
+B = [-1; 0; 0; 0; 0];
+C = [1, 0, 0, 0, 0];
 D = 0;
 
 % Weighting matrices:
@@ -57,12 +57,13 @@ maxIteration = 9e6;                % maximal iteration number
 stopCrit = 1e-12;                  % stopping criteria
 
 % Set initial conditions x0, set-point xe, and translate the state and input:
-x0 = [1; 2; 3; 4]; %initial conditions
-x1e = randi(5); 
+x0 = [1; 2; 3; 4; 5]; %initial conditions
+x1e = 2.66933651; %same as full-state feedback 
 x2e = 0; %see source paper [2] for the reason of this condition
 x3e = 0; %see source paper [2] for the reason of this condition
-x4e = (3.40742062/5.6353227)*x1e; %(a_41/a_14)*x1e; see source paper [2] for the reason of this condition  
-xe = [x1e; x2e; x3e; x4e]; 
+x7e = 0; %see source paper [2] for the reason of this condition
+x4e = (1.04232242/7.44121644)*x1e; %(a_41/a_14)*x1e; see source paper [2] for the reason of this condition  
+xe = [x1e; x2e; x3e; x4e; x7e]; 
 x_tilde_0 = x0 - xe;
 v_e = 0;
 
@@ -93,7 +94,7 @@ figure
 plot(t, x_tilde1)
 grid on
 title("Newton's method")
-leg = legend('$\tilde{x}_1$', '$\tilde{x}_2$', '$\tilde{x}_3$', '$\tilde{x}_4$');
+leg = legend('$\tilde{x}_1$', '$\tilde{x}_2$', '$\tilde{x}_3$', '$\tilde{x}_4$', '$\tilde{x}_7$');
 set(leg,'Interpreter','latex');
 
 % Translated output y_tilde(t) = C*x_tilde(t):
@@ -109,6 +110,7 @@ x11 = x_tilde1(:,1) + x1e;
 x21 = x_tilde1(:,2) + x2e;
 x31 = x_tilde1(:,3) + x3e;
 x41 = x_tilde1(:,4) + x4e;
+x71 = x_tilde1(:,5) + x7e;
 figure
 plot(t, x11, 'linewidth',4);
 hold on;
@@ -118,11 +120,13 @@ plot(t, x31, '--', 'linewidth',4);
 hold on;
 plot(t, x41, 'linewidth',4);
 grid on
+plot(t, x71, 'linewidth',4);
+grid on
 title("Newton's method")
 xlabel('Time, t [d]')
 ylabel('Original state, x(t) [t]')
-fontsize(29,"points")
-leg = legend('$x_1$', '$x_2$', '$x_3$', '$x_4$');
+fontsize(40,"points")
+leg = legend('$x_1$', '$x_2$', '$x_3$', '$x_4$', '$x_7$');
 set(leg,'Interpreter','latex');
 xlim([0, 15])
 xticks([0, 5, 10, 15])
@@ -135,8 +139,9 @@ grid on
 title("Newton's method")
 xlabel('Time, t [d]')
 ylabel('Original output, y(t) [t]')
-fontsize(29,"points")
+fontsize(40,"points")
 xlim([0, 15])
+yticks([0, 3, 6, 9, 12, 15])
 xticks([0, 5, 10, 15])
 
 % Original control input u(t) = -K*(y - C*xe) + v_e:
@@ -147,8 +152,9 @@ grid on
 title("Newton's method")
 xlabel('Time, t [d]')
 ylabel('Control input, u(t) [t/d]')
-fontsize(29,"points")
+fontsize(40,"points")
 xlim([0, 15])
+yticks([0, 3, 6, 9])
 xticks([0, 5, 10, 15])
 
 
